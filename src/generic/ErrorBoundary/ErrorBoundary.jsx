@@ -4,11 +4,12 @@ class ErrorBoundary extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            active: false
+            // active: false,
+            hasError: false
         }
     }
 
-    componentDidMount() {
+    /* componentDidMount() {
         console.log('El componente se a montado')
     }
 
@@ -20,16 +21,21 @@ class ErrorBoundary extends Component {
 
     componentWillUnmount() {
         console.log('El componente se ha desmontado')
-    }
-
+    } 
     clickButtonHandler = () => this.setState({ active: true })
-
+    */
+    static getDerivedStateFromError(error) {
+        return { hasError: true }
+    }
+    componentDidCatch(error, errorInfo) {
+        console.log("ErrorInfo", errorInfo)
+    }
     render() {
         return (
-            <div>
-                <h1>Error Boundary {this.state.active ? 'active' : 'not active'}</h1>
-                <button onClick={this.clickButtonHandler}>Change state</button>
-            </div>
+            this.state.hasError ?
+            (<h1>There is an error</h1>)
+            :
+            (this.props.children)
         )
     }
 }

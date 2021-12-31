@@ -9,5 +9,5 @@ test('WeatherDetails render', async () => {
     const humidity = await findByText(/80/);    
 
     expect(wind).toHaveTextContent('Wind: 10 km/h')
-    expect(humidity).toHaveTextContent('Humidity: 80%')
+    expect(humidity).toHaveTextContent('Humidity: 80 %')
 });

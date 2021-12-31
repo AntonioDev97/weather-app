@@ -1,60 +1,35 @@
-import React from 'react';
-import { Grid } from '@material-ui/core';
+import React, { useMemo } from 'react';
+import { CircularProgress, Grid, LinearProgress } from '@material-ui/core';
+import useCityPage from '../hooks/useCityPage';
 import AppFrame from '../components/AppFrame';
 import CityInfo from '../components/CityInfo';
 import Forecast from '../components/Forecast';
 import ForecastChart from '../components/ForecastChart';
 import Weather from '../components/Weather';
 import WeatherDetails from '../components/WeatherDetails';
+import { useCityList } from '../hooks/useCityList';
+import { getCityCode } from '../utils/utils';
+import { getCountryNameByCode } from '../utils/serviceCities';
 
-const data = [
-    {
-        "dayHour": "Jue 18",
-        "min": 14,
-        "max": 22,
-    },
-    {
-        "dayHour": "Vie 06",
-        "min": 18,
-        "max": 27,
-    },
-    {
-        "dayHour": "Vie 12",
-        "min": 18,
-        "max": 28,
-    },
-    {
-        "dayHour": "Vie 18",
-        "min": 18,
-        "max": 25,
-    },
-    {
-        "dayHour": "Sab 06",
-        "min": 15,
-        "max": 22,
-    },
-    {
-        "dayHour": "Sab 12",
-        "min": 12,
-        "max": 19,
-    }
-];
-const forecastItemsList = [
-    { hour: 18, state: 'clear', temperature: 17, weekDay: 'Monday' },
-    { hour: 6, state: 'clouds', temperature: 18, weekDay: 'Tuesday' },
-    { hour: 12, state: 'fog', temperature: 14, weekDay: 'Wednesday' },
-    { hour: 17, state: 'clouds', temperature: 19, weekDay: 'Thursday' },
-    { hour: 19, state: 'rain', temperature: 11, weekDay: 'Friday' },
-    { hour: 12, state: 'rain', temperature: 13, weekDay: 'Saturday' }
-];
+const CityPage = ({ actions, data }) => {
+    const { onSetAllWeather, onSetChartData, onSetForecastItemList } = actions;
+    const { allWeather, allChartData, allForecastItemsList } = data;
+    
+    const { city, countryCode } = useCityPage(onSetChartData, onSetForecastItemList, allChartData, allForecastItemsList);
+    const cities = useMemo(() => ([{ city, countryCode }]), [city, countryCode]);
+    
+    useCityList(cities, allWeather, onSetAllWeather);
+    
+    const cityCode = getCityCode(city, countryCode);
+    const weather = allWeather[cityCode];
+    const chartData = allChartData[cityCode];
+    const forecastItemsList = allForecastItemsList[cityCode];
 
-const CityPage = () => {
-    const city = 'Tlaxcala';
-    const country = 'Mexico';
-    const state = 'clouds';
-    const temperature = 22;
-    const humidity = 80;
-    const wind = 5;
+    const country = getCountryNameByCode(countryCode);
+    const state = weather && weather.state;
+    const temperature = weather && weather.temperature;
+    const humidity = weather && weather.humidity;
+    const wind = weather && weather.wind;
 
     return (
         <AppFrame>
@@ -72,13 +47,17 @@ const CityPage = () => {
                 <Grid container item xs={12}
                     justifyContent='center'>
                         <Weather state={state} temperature={temperature}/>
-                        <WeatherDetails humidity={humidity} wind={wind}/>
+                        { humidity && wind && <WeatherDetails humidity={humidity} wind={wind}/> }
                 </Grid>
                 <Grid item>
-                    <ForecastChart data={data} />
+                    { !chartData && !forecastItemsList && <LinearProgress /> }
+                    { !chartData && !forecastItemsList && <CircularProgress /> }
                 </Grid>
                 <Grid item>
-                    <Forecast forecastItems={forecastItemsList}/>
+                    { chartData && <ForecastChart data={chartData} /> }
+                </Grid>
+                <Grid item>
+                    { forecastItemsList && <Forecast forecastItems={forecastItemsList}/> }
                 </Grid>
             </Grid>
         </AppFrame>

@@ -9,9 +9,20 @@ const citiesAndCountryData = [
     { city: 'Washington', country: 'United States', countryCode: 'US'  },
 ]
 
+const actions = {
+    onSetAllWeather: jest.fn(), 
+    onSetChartData: jest.fn(),
+    onSetForecastItemList: jest.fn(),
+}
+const data = {
+    allWeather: {},
+    allChartData: {},
+    allForecastItemsList: {}
+}
+
 test('CityList render', async () => {
     const fnClickOnItem = jest.fn();
-    const { findAllByRole } = render(<CityList cities={citiesAndCountryData} onClickCity={fnClickOnItem} />);
+    const { findAllByRole } = render(<CityList cities={citiesAndCountryData} onClickCity={fnClickOnItem} actions={actions} data={data} />);
     const items = await findAllByRole('button');
     await act(() => Promise.resolve());
     expect(items).toHaveLength(4);
@@ -19,7 +30,7 @@ test('CityList render', async () => {
 
 test('CityList click on item', async () => {
     const fnClickOnItem = jest.fn();
-    const { findAllByRole } = render(<CityList cities={citiesAndCountryData} onClickCity={fnClickOnItem} />)
+    const { findAllByRole } = render(<CityList cities={citiesAndCountryData} onClickCity={fnClickOnItem} actions={actions} data={data} />)
     const items = await findAllByRole('button');
     
     fireEvent.click(items[0]);

@@ -5,7 +5,7 @@ import { Typography } from '@material-ui/core';
 const WeatherDetails = ({ humidity, wind }) => {
     return (
         <>
-            <Typography>Humidity: {humidity}%</Typography>
+            <Typography>Humidity: {humidity} %</Typography>
             <Typography>Wind: {wind} km/h</Typography>
         </>
     );

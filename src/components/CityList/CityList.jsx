@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
-import ConvertUnits from 'convert-units';
 import { Grid, List, ListItem }  from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
+import { useCityList } from '../../hooks/useCityList';
+import { getCityCode } from '../../utils/utils';
 import CityInfo from '../CityInfo';
 import Weather from '../Weather';
 
@@ -13,8 +13,8 @@ const renderCityCountry = eventOnClickCity => (cityAndCountry, weather) => {
     return (
         <ListItem 
             button
-            key={`${city}-${countryCode}`} 
-            onClick={eventOnClickCity}>
+            key={getCityCode(city, countryCode)} 
+            onClick={() => eventOnClickCity(city, countryCode)}>
             <Grid container justifyContent="center" alignItems="center">
                 <Grid item md={9} xs={12} >
                     <CityInfo city={city} country={country} />
@@ -29,37 +29,10 @@ const renderCityCountry = eventOnClickCity => (cityAndCountry, weather) => {
     )
 }
 
-const CityList = ({ cities, onClickCity }) => {
-    const [ allWeather, setAllWeather ] = useState({});
-    const [ error, setError ] = useState(null);
-
-    useEffect(() => {
-        const setWeather = async (city, countryCode) => {
-            const apiKey = 'd82baad4a11a9b1a2974b259a2fc1fca';
-            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city},${countryCode}&appid=${apiKey}`
-            try {
-                const response = await axios.get(url);
-                const temperature = Number(ConvertUnits(response.data.main.temp).from('K').to('C').toFixed(1));
-                const state = response.data.weather[0].main.toLowerCase();
-                setAllWeather(allWeather => ({ ...allWeather, [`${city}-${countryCode}`]: { temperature, state } }));
-            } catch (err) {
-                if (err.response) {
-                    const { data, status } = err.response;
-                    console.error('error', err.response)
-                    setError('Error data does not retrieved');
-                } else if (err.request) {
-                    console.error('error', err.request)
-                    setError('Error verify your internet conexion');
-                } else {
-                    console.error('error', err)
-                    setError('Error data lost');
-                }
-            }
-        }
-        cities.forEach(({ city, countryCode }) => {
-            setWeather(city, countryCode);
-        });
-    }, [cities])
+const CityList = ({ cities, onClickCity, actions, data }) => {
+    const { onSetAllWeather } = actions;
+    const { allWeather } = data;
+    const { error, setError } = useCityList(cities, allWeather, onSetAllWeather);
 
     return (
         <div> 
