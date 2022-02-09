@@ -4,7 +4,7 @@ import getAllWeather from '../utils/transform/getAllWeather';
 import { getWeatherUrl } from '../utils/urls';
 import { getCityCode } from '../utils/utils';
 
-export const useCityList = (cities, allWeather, onSetAllWeather) => {
+export const useCityList = (cities, allWeather, actions) => {
     // const [ allWeather, setAllWeather ] = useState({});
     const [ error, setError ] = useState(null);
 
@@ -12,11 +12,14 @@ export const useCityList = (cities, allWeather, onSetAllWeather) => {
         const setWeather = async (city, countryCode) => {
             const url = getWeatherUrl(city, countryCode);
             try {
-                onSetAllWeather({ [getCityCode(city, countryCode)]: {} });
+                // onSetAllWeather({ [getCityCode(city, countryCode)]: {} });
+                actions({ type:'SET_ALL_WEATHER', payload: { [getCityCode(city, countryCode)]: {} } })
+
                 const response = await axios.get(url);
                 const allWeatherAux = getAllWeather(response, city, countryCode);
-                onSetAllWeather(allWeatherAux);
-                //setAllWeather(allWeather => ({ ...allWeather, ...allWeatherAux }));
+                actions({ type: 'SET_ALL_WEATHER', payload: allWeatherAux });
+                // onSetAllWeather(allWeatherAux);
+                // setAllWeather(allWeather => ({ ...allWeather, ...allWeatherAux }));
             } catch (err) {
                 if (err.response) {
                     setError('Error data does not retrieved');
@@ -34,6 +37,6 @@ export const useCityList = (cities, allWeather, onSetAllWeather) => {
                 setWeather(city, countryCode);
             }
         });
-    }, [cities, allWeather, onSetAllWeather])
+    }, [cities, allWeather, actions])
     return { error, setError };
 }

@@ -11,8 +11,10 @@ import {
 import { IconContext } from 'react-icons'
 import { WiDaySunny } from 'react-icons/wi';
 import { Link as LinkRouter } from 'react-router-dom';
+import ErrorBoundary from '../../generic/ErrorBoundary';
 
 const AppFrame = ({ children }) => {
+    const iconContextSize = React.useMemo(() => ({ size: '2em' }), []); 
     return (
         <Grid container
             justifyContent='center'>
@@ -24,7 +26,7 @@ const AppFrame = ({ children }) => {
                             to='/main' 
                             color='inherit' 
                             aria-label='menu'>
-                            <IconContext.Provider value={{size: '2em'}}>
+                            <IconContext.Provider value={iconContextSize}>
                                 <WiDaySunny/>
                             </IconContext.Provider>
                         </Link>
@@ -39,7 +41,7 @@ const AppFrame = ({ children }) => {
                 ms={11}
                 md={10}
                 lg={9}>
-                { children }
+                <ErrorBoundary>{ children }</ErrorBoundary>
             </Grid>
         </Grid>
     );
